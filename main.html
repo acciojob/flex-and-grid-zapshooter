@@ -1,16 +1,284 @@
 <!DOCTYPE html>
-
-<html>
-
+<html lang="en">
 <head>
-	<link rel="stylesheet" href="styles.css">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Web Dev Tutorials</title>
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:wght@400;500&display=swap" rel="stylesheet"/>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'DM Sans', sans-serif;
+      background: #f0f0ec;
+      min-height: 100vh;
+      padding: 60px 40px;
+    }
+
+    .page-title {
+      font-family: 'Syne', sans-serif;
+      font-size: 2rem;
+      font-weight: 800;
+      letter-spacing: -0.03em;
+      color: #111;
+      margin-bottom: 6px;
+    }
+
+    .page-subtitle {
+      font-size: 0.95rem;
+      color: #666;
+      margin-bottom: 48px;
+    }
+
+    /* ── ACCEPTANCE CRITERIA: display: grid ── */
+    .cards-wrapper {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 32px;
+      max-width: 1100px;
+    }
+
+    .card-outer {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .card-number {
+      font-family: 'Syne', sans-serif;
+      font-size: 2.8rem;
+      font-weight: 800;
+      color: #222;
+      letter-spacing: -0.04em;
+      line-height: 1;
+    }
+
+    /* ── ACCEPTANCE CRITERIA: border + background-color ── */
+    .card {
+      border: 10px solid #ccc;
+      background-color: #fafafa;
+      border-radius: 18px;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      position: relative;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.10);
+      transition: transform 0.25s ease, box-shadow 0.25s ease;
+      cursor: pointer;
+    }
+
+    .card:hover {
+      transform: translateY(-6px);
+      box-shadow: 0 18px 48px rgba(0,0,0,0.18);
+    }
+
+    .card-image {
+      position: relative;
+      height: 220px;
+      overflow: hidden;
+    }
+
+    /* Placeholder image backgrounds using CSS gradients */
+    .card:nth-child(1) .card-image { background: linear-gradient(135deg, #0f1923 0%, #1a2a3a 40%, #243447 100%); }
+    .card:nth-child(2) .card-image { background: linear-gradient(135deg, #2a2a2a 0%, #4a4a4a 60%, #6a6a6a 100%); }
+    .card:nth-child(3) .card-image { background: linear-gradient(135deg, #0d1b2a 0%, #1b3a55 50%, #243347 100%); }
+
+    /* Code overlay for card 1 */
+    .code-overlay {
+      position: absolute;
+      inset: 0;
+      padding: 12px 16px;
+      font-family: 'Courier New', monospace;
+      font-size: 9px;
+      line-height: 1.6;
+      color: rgba(255,255,255,0.35);
+      overflow: hidden;
+      pointer-events: none;
+    }
+    .code-overlay .tag { color: #e06c75; }
+    .code-overlay .attr { color: #d19a66; }
+    .code-overlay .val  { color: #98c379; }
+
+    /* Chain overlay for card 3 */
+    .chain-overlay {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+    }
+    .chain-links {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      transform: rotate(-20deg) translateY(-10px);
+      opacity: 0.55;
+    }
+    .chain-link {
+      width: 56px;
+      height: 28px;
+      border: 5px solid #c8a84b;
+      border-radius: 14px;
+      margin-left: 20px;
+    }
+    .chain-link:nth-child(even) { margin-left: 0; }
+
+    /* Person silhouette for card 2 */
+    .person-overlay {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      align-items: flex-end;
+      justify-content: center;
+      overflow: hidden;
+    }
+    .person-svg { width: 100%; height: 100%; opacity: 0.45; }
+
+    .card-date {
+      position: absolute;
+      top: 12px;
+      right: 14px;
+      font-size: 0.72rem;
+      color: rgba(255,255,255,0.85);
+      font-weight: 500;
+      letter-spacing: 0.02em;
+      z-index: 2;
+    }
+
+    .card-body {
+      padding: 20px 20px 18px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      flex: 1;
+    }
+
+    /* ── ACCEPTANCE CRITERIA: h1 font-size 1.5em ── */
+    .card-body h1 {
+      font-family: 'Syne', sans-serif;
+      font-size: 1.5em;
+      font-weight: 700;
+      color: #111;
+      line-height: 1.25;
+      letter-spacing: -0.02em;
+    }
+
+    /* ── ACCEPTANCE CRITERIA: p font-size 0.75em ── */
+    .card-body p {
+      font-size: 0.75em;
+      color: #555;
+      line-height: 1.6;
+      flex: 1;
+    }
+
+    .card-tag {
+      display: inline-block;
+      padding: 4px 12px;
+      background: #e0e0e0;
+      color: #444;
+      font-size: 0.7em;
+      font-weight: 500;
+      border-radius: 6px;
+      letter-spacing: 0.04em;
+      align-self: flex-start;
+      margin-top: 4px;
+    }
+
+    @media (max-width: 768px) {
+      .cards-wrapper { grid-template-columns: 1fr; }
+    }
+  </style>
 </head>
-
 <body>
-	<!-- the entire body must be written by student -->
-    <script type="text/javascript" src="./script.js">
-</script>
 
+  <h2 class="page-title">Example</h2>
+  <p class="page-subtitle">It should look like this</p>
+
+  <div class="cards-wrapper">
+
+    <!-- Card 1 -->
+    <div class="card-outer">
+      <div class="card-number">01</div>
+      <div class="card">
+        <div class="card-image">
+          <div class="code-overlay">
+            <span class="tag">&lt;meta</span> <span class="attr">content</span>=<span class="val">"width=device-width"</span><span class="tag">&gt;</span><br>
+            <span class="tag">&lt;link</span> <span class="attr">href</span>=<span class="val">"/favicon.ico"</span> <span class="attr">type</span>=<span class="val">"image/x-icon"</span><span class="tag">&gt;</span><br>
+            <span class="tag">&lt;link</span> <span class="attr">rel</span>=<span class="val">"stylesheet"</span> <span class="attr">href</span>=<span class="val">"css/materialize.css"</span><span class="tag">&gt;</span><br>
+            <span class="tag">&lt;link</span> <span class="attr">rel</span>=<span class="val">"stylesheet"</span> <span class="attr">href</span>=<span class="val">"css/animate.css"</span><span class="tag">&gt;</span><br>
+            <span class="tag">&lt;link</span> <span class="attr">rel</span>=<span class="val">"stylesheet"</span> <span class="attr">href</span>=<span class="val">"css/theme.css"</span><span class="tag">&gt;</span><br><br>
+            <span class="tag">&lt;nav</span> <span class="attr">class</span>=<span class="val">"nav"</span><span class="tag">&gt;</span><br>
+            &nbsp;&nbsp;<span class="tag">&lt;div</span> <span class="attr">class</span>=<span class="val">"container"</span><span class="tag">&gt;</span><br>
+            &nbsp;&nbsp;&nbsp;&nbsp;<span class="tag">&lt;a</span> <span class="attr">class</span>=<span class="val">"brand"</span><span class="tag">&gt;</span>...<span class="tag">&lt;/a&gt;</span><br>
+            &nbsp;&nbsp;<span class="tag">&lt;/div&gt;</span><br>
+            <span class="tag">&lt;/nav&gt;</span><br>
+            <span class="tag">&lt;div</span> <span class="attr">class</span>=<span class="val">"container"</span><span class="tag">&gt;</span><br>
+            &nbsp;&nbsp;<span class="tag">&lt;div</span> <span class="attr">class</span>=<span class="val">"hide-on-small-only"</span><span class="tag">&gt;</span>
+          </div>
+          <div class="card-date">6 Oct 2022</div>
+        </div>
+        <div class="card-body">
+          <h1>HTML Syntax</h1>
+          <p>The syntax of a language is how it works. How to actually write it. Learn HTML syntax...</p>
+          <span class="card-tag">HTML</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Card 2 -->
+    <div class="card-outer">
+      <div class="card-number">02</div>
+      <div class="card">
+        <div class="card-image">
+          <div class="person-overlay">
+            <svg class="person-svg" viewBox="0 0 300 220" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <!-- simplified person silhouette -->
+              <ellipse cx="195" cy="60" rx="30" ry="35" fill="rgba(255,255,255,0.3)"/>
+              <rect x="150" y="90" width="90" height="130" rx="12" fill="rgba(255,255,255,0.2)"/>
+              <rect x="80" y="150" width="130" height="80" rx="8" fill="rgba(255,255,255,0.15)"/>
+              <!-- laptop screen hint -->
+              <rect x="82" y="152" width="126" height="60" rx="6" fill="rgba(255,255,255,0.1)"/>
+            </svg>
+          </div>
+          <div class="card-date">9 Jan 2023</div>
+        </div>
+        <div class="card-body">
+          <h1>Basic types of HTML tags</h1>
+          <p>Learn about some of the most common HTML tags...</p>
+          <span class="card-tag">HTML</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Card 3 -->
+    <div class="card-outer">
+      <div class="card-number">03</div>
+      <div class="card">
+        <div class="card-image">
+          <div class="chain-overlay">
+            <div class="chain-links">
+              <div class="chain-link"></div>
+              <div class="chain-link"></div>
+              <div class="chain-link"></div>
+              <div class="chain-link"></div>
+              <div class="chain-link"></div>
+              <div class="chain-link"></div>
+              <div class="chain-link"></div>
+              <div class="chain-link"></div>
+            </div>
+          </div>
+          <div class="card-date">14 Dec 2022</div>
+        </div>
+        <div class="card-body">
+          <h1>Links, images and about file paths</h1>
+          <p>Learn how to use links and images along with file paths...</p>
+          <span class="card-tag">HTML</span>
+        </div>
+      </div>
+    </div>
+
+  </div>
 </body>
-
 </html>
